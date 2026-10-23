@@ -9,11 +9,11 @@ public final class HelloProsedural {
     }
 
     /**
-     * TODO minggu 1: kembalikan sapaan yang memuat kata "Aset-Pinjam", nama, dan NIM.
+     * Mengembalikan sapaan yang memuat kata "Aset-Pinjam", nama, dan NIM.
      * Contoh bentuk: "Hello Aset-Pinjam, saya Budi (2310112345)".
      */
     public static String sapa(String nama, String nim) {
-        throw new UnsupportedOperationException("TODO minggu 1: HelloProsedural.sapa");
+        return "Hello Aset-Pinjam, saya " + nama + " (" + nim + ")";
     }
 
     public static void main(String[] args) {
