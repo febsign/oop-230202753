@@ -1,0 +1,65 @@
+@startuml sequence-pengajuan
+title Sequence Diagram - Pengajuan Peminjaman Aset
+autonumber
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+
+actor "Peminjam" as user
+participant "jadwal : JadwalPeminjaman" as jadwal
+participant "baru : Peminjaman" as peminjaman
+collections "daftar : List<Peminjaman>" as daftar
+
+user -> jadwal : ajukan(baru)
+activate jadwal
+
+jadwal -> peminjaman : getAset()
+activate peminjaman
+peminjaman --> jadwal : aset
+deactivate peminjaman
+
+jadwal -> jadwal : bentrok(baru)
+activate jadwal
+note right of jadwal
+    Pemeriksaan terhadap peminjaman lain
+    pada aset yang sama:
+    waktu rentang saling tumpang tindih
+end note
+jadwal --> jadwal : isBentrok
+deactivate jadwal
+
+alt isBentrok == true (Skenario Bentrok Jadwal)
+    create participant "e : PeminjamanBentrokException" as ex
+    jadwal -> ex : new("Peminjaman bentrok pada aset: " + kode)
+    activate ex
+    ex --> jadwal : e
+    deactivate ex
+
+    jadwal --> user : throw PeminjamanBentrokException
+    note over user, jadwal #FFDDDD
+        Pengajuan GAGAL / DITOLAK.
+        Objek baru TIDAK ditambahkan ke daftar jadwal.
+    end note
+
+else isBentrok == false (Skenario Sukses)
+    opt aset.getJenis() == JenisAset.LAPTOP
+        jadwal -> jadwal : hitungLaptopAktif(peminjam)
+        note right of jadwal
+            Validasi kuota laptop peminjam
+        end note
+    end
+
+    jadwal -> daftar : add(baru)
+    activate daftar
+    daftar --> jadwal : true
+    deactivate daftar
+
+    jadwal --> user : return void (sukses)
+    note over user, jadwal #DDFFDD
+        Pengajuan SUKSES.
+        Peminjaman berstatus DIAJUKAN dan tersimpan di jadwal.
+    end note
+end
+
+deactivate jadwal
+
+@enduml
