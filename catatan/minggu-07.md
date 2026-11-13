@@ -24,3 +24,4 @@ Menentukan formula evaluasi tumpang tindih waktu yang ringkas namun mencakup sel
 - Prompt utama: "analisis minggu-07.md" dan "kerjakan minggu-07.md".
 - Yang saya ubah atau tolak dari saran AI, dan alasannya: Memastikan pengurutan pada `semuaUrutMulai()` tidak melakukan pengurutan langsung di tempat (*in-place sort* pada `daftar`), melainkan membentuk salinan list baru dari stream untuk menghindari *side-effect* terhadap urutan penambahan data internal.
 - Satu hal yang saya pahami lebih baik sekarang: Bagaimana Java Collections Framework bekerja secara harmonis bersama Stream API dan `Comparator` untuk mengolah data (filter, grouping, sorting) secara deklaratif, bersih, dan aman.
+
