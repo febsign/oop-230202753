@@ -20,10 +20,10 @@ Salin setiap pertanyaan ambigu (nomor 1 sampai 7) ke sini dan jawab. Contoh:
 
 ## A-01: batas waktu bentrok
 - Pertanyaan: 09:00-11:00 dan 11:00-13:00 pada aset yang sama bentrok atau tidak?
-- Keputusan: (isi)
-- Alasan: (isi)
-- Dampak ke kode: (isi)
-- Tes yang membuktikan: (isi)
+- Keputusan: Tidak bentrok. Peminjaman baru diperbolehkan mulai tepat pada saat peminjaman sebelumnya selesai pada aset yang sama.
+- Alasan: Rentang waktu peminjaman dimodelkan sebagai interval setengah terbuka $[t_{mulai}, t_{selesai})$. Waktu selesai menunjukkan batas akhir penggunaan dan saat aset dikembalikan/dikosongkan, sehingga aset langsung siap digunakan untuk sesi peminjaman berikutnya tanpa ada irisan waktu pemakaian simultan. Model ini memaksimalkan utilisasi aset kampus tanpa menimbulkan konflik jadwal riil.
+- Dampak ke kode: Pada `id.ac.upb.asetpinjam.jadwal.JadwalPeminjaman.bentrok(Peminjaman)`, pengecekan tumpang tindih waktu menggunakan logika `p1.getMulai().isBefore(p2.getSelesai()) && p2.getMulai().isBefore(p1.getSelesai())`. Jika `p1.getSelesai().equals(p2.getMulai())`, kondisi tersebut menghasilkan `false` sehingga tidak dinyatakan bentrok.
+- Tes yang membuktikan: `id.ac.upb.asetpinjam.mahasiswa.BatasBentrokTest.selesaiSamaDenganMulai` dan `id.ac.upb.asetpinjam.mahasiswa.BatasBentrokTest.mulaiSamaDenganSelesaiKebalikan`.
 
 ## Asumsi lain
 

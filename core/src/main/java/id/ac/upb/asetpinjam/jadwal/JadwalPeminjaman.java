@@ -2,8 +2,10 @@ package id.ac.upb.asetpinjam.jadwal;
 
 import id.ac.upb.asetpinjam.model.Peminjaman;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Jadwal peminjaman di memori.
@@ -38,22 +40,40 @@ public class JadwalPeminjaman {
      * Definisi "bentrok" di batas waktu (selesai sama dengan mulai) adalah KEPUTUSAN ANDA (docs/asumsi.md).
      */
     public boolean bentrok(Peminjaman baru) {
-        throw new UnsupportedOperationException("TODO minggu 7: bentrok");
+        if (baru == null) {
+            return false;
+        }
+        return daftar.stream()
+                .filter(lama -> lama.getAset().getKode().equals(baru.getAset().getKode()))
+                .anyMatch(lama -> isTumpangTindih(lama, baru));
+    }
+
+    private boolean isTumpangTindih(Peminjaman p1, Peminjaman p2) {
+        // Model interval setengah terbuka [mulai, selesai):
+        // Bentrok jika p1.mulai < p2.selesai DAN p2.mulai < p1.selesai.
+        // Jika p1.selesai == p2.mulai atau sebaliknya, tidak bentrok.
+        return p1.getMulai().isBefore(p2.getSelesai()) && p2.getMulai().isBefore(p1.getSelesai());
     }
 
     /** TODO minggu 7: semua peminjaman, diurutkan menurut waktu mulai (gunakan Comparator). */
     public List<Peminjaman> semuaUrutMulai() {
-        throw new UnsupportedOperationException("TODO minggu 7: semuaUrutMulai");
+        return daftar.stream()
+                .sorted(Comparator.comparing(Peminjaman::getMulai).thenComparing(Peminjaman::getId))
+                .collect(Collectors.toList());
     }
 
     /** TODO minggu 7: peminjaman dikelompokkan menurut kode aset. */
     public Map<String, List<Peminjaman>> perAset() {
-        throw new UnsupportedOperationException("TODO minggu 7: perAset");
+        return daftar.stream()
+                .collect(Collectors.groupingBy(p -> p.getAset().getKode()));
     }
 
     /** TODO minggu 7: hapus peminjaman berdasarkan id. True jika ada yang terhapus. */
     public boolean hapus(String id) {
-        throw new UnsupportedOperationException("TODO minggu 7: hapus");
+        if (id == null) {
+            return false;
+        }
+        return daftar.removeIf(p -> id.equals(p.getId()));
     }
 
     /**
