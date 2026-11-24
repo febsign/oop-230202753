@@ -1,9 +1,13 @@
 package id.ac.upb.asetpinjam.exception;
 
-/** Minggu 9: jadwal peminjaman bentrok. Pesan harus menyebut aset yang bentrok (ubah konstruktornya). */
+/** Minggu 9: jadwal peminjaman bentrok. Pesan harus menyebut aset yang bentrok. */
 public class PeminjamanBentrokException extends AsetPinjamException {
 
+    public PeminjamanBentrokException(String kodeAset) {
+        super("Peminjaman bentrok untuk aset: " + kodeAset);
+    }
+
     public PeminjamanBentrokException() {
-        super("TODO minggu 9: isi pesan yang jelas");
+        super("Peminjaman bentrok pada aset");
     }
 }

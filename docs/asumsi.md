@@ -37,3 +37,17 @@ Tambahkan di sini keputusan lain yang Anda ambil: rumus denda progresif, perubah
 - Dampak ke kode: `id.ac.upb.asetpinjam.denda.DendaProgresif.hitung(Aset, int)`.
 - Tes yang membuktikan: `id.ac.upb.asetpinjam.Minggu05AbstraksiTest.dendaProgresifMemenuhiSyaratMinimal`.
 
+## A-09: Perhitungan Status DIAJUKAN dalam Kuota Laptop (Minggu 9)
+- Pertanyaan: Apakah peminjaman laptop yang masih berstatus DIAJUKAN dihitung dalam kuota laptop peminjam?
+- Keputusan: Status DIAJUKAN tidak dihitung dalam kuota laptop peminjam. Hanya peminjaman berstatus DISETUJUI atau DIPINJAM yang memotong kuota.
+- Alasan: Status DIAJUKAN adalah permohonan awal yang belum tentu disetujui oleh admin/petugas. Jika permohonan yang belum disetujui langsung memotong kuota, peminjam dapat dirugikan oleh antrean pengajuan yang berpotensi ditolak. Sesuai aturan bisnis, kuota membatasi aset yang aktif dipegang atau telah disetujui untuk diserahterimakan.
+- Dampak ke kode: Pada `id.ac.upb.asetpinjam.jadwal.JadwalPeminjaman.ajukan`, pengecekan kuota laptop memfilter peminjaman yang berstatus `DISETUJUI` atau `DIPINJAM`.
+- Tes yang membuktikan: `id.ac.upb.asetpinjam.mahasiswa.JadwalExceptionAsumsiTest.diajukanTidakDihitungDalamKuotaLaptop`.
+
+## A-10: Pengaruh Status DITOLAK dan DIBATALKAN pada Jadwal Bentrok (Minggu 9)
+- Pertanyaan: Apakah peminjaman dengan status DITOLAK atau DIBATALKAN masih menempati jadwal dan menyebabkan bentrok?
+- Keputusan: Peminjaman berstatus DITOLAK atau DIBATALKAN tidak menempati jadwal dan tidak dianggap bentrok untuk pengajuan baru.
+- Alasan: Ketika suatu pengajuan ditolak atau dibatalkan, hak penggunaan aset pada rentang waktu tersebut telah gugur. Menganggap slot tersebut tetap bentrok akan menghalangi peminjam lain untuk menggunakan aset yang sebenarnya menganggur.
+- Dampak ke kode: Pada `id.ac.upb.asetpinjam.jadwal.JadwalPeminjaman.bentrok`, data peminjaman dengan status `DITOLAK` dan `DIBATALKAN` dikecualikan dari pengecekan tumpang tindih waktu.
+- Tes yang membuktikan: `id.ac.upb.asetpinjam.mahasiswa.JadwalExceptionAsumsiTest.peminjamanDitolakAtauDibatalkanTidakMenempatiJadwal` dan `peminjamanDibatalkanTidakMenempatiJadwal`.
+

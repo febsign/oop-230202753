@@ -1,6 +1,10 @@
 package id.ac.upb.asetpinjam.jadwal;
 
+import id.ac.upb.asetpinjam.exception.KuotaHabisException;
+import id.ac.upb.asetpinjam.exception.PeminjamanBentrokException;
+import id.ac.upb.asetpinjam.model.JenisAset;
 import id.ac.upb.asetpinjam.model.Peminjaman;
+import id.ac.upb.asetpinjam.model.StatusPeminjaman;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -45,6 +49,7 @@ public class JadwalPeminjaman {
         }
         return daftar.stream()
                 .filter(lama -> lama.getAset().getKode().equals(baru.getAset().getKode()))
+                .filter(lama -> lama.getStatus() != StatusPeminjaman.DITOLAK && lama.getStatus() != StatusPeminjaman.DIBATALKAN)
                 .anyMatch(lama -> isTumpangTindih(lama, baru));
     }
 
@@ -77,11 +82,27 @@ public class JadwalPeminjaman {
     }
 
     /**
-     * TODO minggu 9: periksa lalu tambahkan.
+     * Minggu 9: periksa lalu tambahkan.
      * Bentrok: PeminjamanBentrokException. Peminjam sudah memegang {@link #kuotaLaptop()} laptop yang
      * aktif (status DISETUJUI atau DIPINJAM) dan mengajukan laptop lagi: KuotaHabisException.
      */
     public void ajukan(Peminjaman baru) {
-        throw new UnsupportedOperationException("TODO minggu 9: ajukan");
+        if (baru == null) {
+            throw new IllegalArgumentException("peminjaman baru tidak boleh null");
+        }
+        if (bentrok(baru)) {
+            throw new PeminjamanBentrokException(baru.getAset().getKode());
+        }
+        if (baru.getAset().getJenis() == JenisAset.LAPTOP) {
+            long aktifLaptop = daftar.stream()
+                    .filter(p -> p.getPeminjam().id().equals(baru.getPeminjam().id()))
+                    .filter(p -> p.getAset().getJenis() == JenisAset.LAPTOP)
+                    .filter(p -> p.getStatus() == StatusPeminjaman.DISETUJUI || p.getStatus() == StatusPeminjaman.DIPINJAM)
+                    .count();
+            if (aktifLaptop >= kuotaLaptop) {
+                throw new KuotaHabisException(baru.getPeminjam().id(), kuotaLaptop);
+            }
+        }
+        daftar.add(baru);
     }
 }

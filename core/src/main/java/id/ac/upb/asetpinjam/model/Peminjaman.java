@@ -1,5 +1,6 @@
 package id.ac.upb.asetpinjam.model;
 
+import id.ac.upb.asetpinjam.exception.StatusTidakSahException;
 import java.time.LocalDateTime;
 
 /**
@@ -59,10 +60,23 @@ public class Peminjaman {
     }
 
     /**
-     * TODO minggu 9: pindahkan ke status baru hanya jika perpindahan sah menurut
+     * Minggu 9: pindahkan ke status baru hanya jika perpindahan sah menurut
      * docs/aturan-bisnis.md. Jika tidak sah, lempar StatusTidakSahException (dengan pesan jelas).
      */
     public void ubahStatus(StatusPeminjaman baru) {
-        throw new UnsupportedOperationException("TODO minggu 9: Peminjaman.ubahStatus");
+        if (baru == null || !isPerpindahanSah(this.status, baru)) {
+            throw new StatusTidakSahException(this.status, baru);
+        }
+        this.status = baru;
+    }
+
+    private boolean isPerpindahanSah(StatusPeminjaman asal, StatusPeminjaman tujuan) {
+        return switch (asal) {
+            case DIAJUKAN -> tujuan == StatusPeminjaman.DISETUJUI || tujuan == StatusPeminjaman.DITOLAK;
+            case DISETUJUI -> tujuan == StatusPeminjaman.DIPINJAM || tujuan == StatusPeminjaman.DIBATALKAN;
+            case DIPINJAM -> tujuan == StatusPeminjaman.DIKEMBALIKAN || tujuan == StatusPeminjaman.TERLAMBAT;
+            case TERLAMBAT -> tujuan == StatusPeminjaman.DIKEMBALIKAN;
+            case DITOLAK, DIBATALKAN, DIKEMBALIKAN -> false;
+        };
     }
 }
